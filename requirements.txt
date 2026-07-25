@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sqlalchemy==2.0.46
+pydantic
+python-dotenv
+asyncpg
+greenlet
