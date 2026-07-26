@@ -23,17 +23,17 @@ class UserRepository:
         return user
 
     async def get_user_by_id(self, user_id: int) -> User:
-        query = select(user).where(User.id == user_id)
+        query = select(User).where(User.id == user_id)
         result = await self.db.execute(query)
         return result.scalars().first()
 
     async def get_user_by_email(self, email: str) -> User | None:
-        query = select(user).where(User.email == email)
+        query = select(User).where(User.email == email)
         result = await self.db.execute(query)
         return result.scalars().first()
 
     async def get_all_users(self, skip: int = 0, limit: int = 10) -> list[User]:
-        query = select(user).offset(skip).limit(limit)
+        query = select(User).offset(skip).limit(limit)
         result = await self.db.execute(query)
         return result.scalars().all()
 
