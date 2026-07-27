@@ -25,6 +25,8 @@ def db_agent_gradio_ui():
 
         def respond(message: str, history: list, current_thread_id: str):
             result = query_db_with_natural_language(message, thread_id=current_thread_id)
+            if history is None:
+                history = []
             history = history + [
                 {"role" : "user", "content" : message},
                 {"role" : "assistant", "content" : result},
@@ -34,8 +36,8 @@ def db_agent_gradio_ui():
 
         msg.submit(
             respond,
-            inputs={msg, chatbot, thread_id},
-            outputs={chatbot, msg, thread_id},
+            inputs=[msg, chatbot, thread_id],
+            outputs=[chatbot, msg, thread_id],
         )
 
     return db_ui

@@ -1,116 +1,85 @@
-# Intelligent Database Agent 🤖
+# 🗄️ Database Copilot Agent
 
-An AI-powered database assistant built with **FastAPI, SQLAlchemy ORM, PostgreSQL, LangChain, and LangGraph** that enables intelligent interaction with databases using natural language.
+An AI-powered database assistant that allows users to interact with PostgreSQL databases using natural language.
 
-The system combines traditional backend architecture with modern AI agent workflows to understand user requests, reason through tasks, generate database operations, and provide meaningful insights.
+This project uses **LangGraph, LangChain, FastAPI, SQLAlchemy ORM, PostgreSQL, and Gradio** to build an intelligent SQL agent that understands user questions, generates SQL queries, executes them safely, and returns human-readable responses.
 
 ---
 
 ## 🚀 Features
 
-### 🗄️ Database Management
-- PostgreSQL database integration
-- SQLAlchemy ORM-based architecture
-- Repository pattern implementation
-- CRUD operations
-- Database session management
-- Data validation using Pydantic
-
-### 🤖 AI Agent Capabilities
-- Natural language database interaction
-- LLM-powered reasoning
-- Intelligent query understanding
-- Automated SQL generation
-- Database insights generation
-- Multi-step AI workflows using LangGraph
-
-### ⚡ Backend Features
-- FastAPI REST API
-- Asynchronous API support
-- Dependency injection
-- Modular architecture
-- Scalable service-layer design
+- 🤖 Natural language database querying
+- 🧠 LangGraph-powered AI agent workflow
+- 🔗 LangChain SQL Database Toolkit integration
+- 🗃️ PostgreSQL database integration
+- 🏗️ SQLAlchemy ORM architecture
+- ⚡ FastAPI backend API
+- 💬 Gradio conversational user interface
+- 🔐 Environment variable based configuration
+- 🧵 Conversation memory using LangGraph checkpointer
+- 🛡️ Safe database interaction with read-only SQL operations
 
 ---
 
 # 🏗️ System Architecture
 
-
 ```
                     User
                      |
                      |
-              Natural Language Query
+                     v
+              Gradio Interface
                      |
                      |
-                 FastAPI
+                     v
+                  FastAPI
                      |
-          -----------------------
-          |                     |
-     API Routers            AI Agent
-                                |
-                           LangGraph
-                                |
-              --------------------------------
-              |              |               |
-        Query Analyzer   SQL Generator   Response Agent
-              |
-              |
-        LangChain + LLM
-              |
-              |
-        SQLAlchemy ORM
-              |
-              |
-          PostgreSQL
+                     |
+                     v
+           LangGraph Database Agent
+                     |
+                     |
+                     v
+            LangChain SQL Toolkit
+                     |
+                     |
+                     v
+               PostgreSQL Database
 ```
 
 ---
 
-# 🧠 LangGraph Agent Workflow
+# 🧠 How It Works
 
+1. User asks a question using natural language.
 
-The AI agent uses LangGraph to create a structured reasoning workflow.
+Example:
 
 ```
-User Question
-
-      |
-      v
-
-Input Understanding Node
-
-      |
-      v
-
-Database Context Retrieval
-
-      |
-      v
-
-SQL Generation Node
-
-      |
-      v
-
-Query Execution Node
-
-      |
-      v
-
-Response Generation Node
-
-      |
-      v
-
-Final Answer
+How many users are in my database?
 ```
 
-LangGraph provides:
-- Stateful agent execution
-- Multiple AI processing steps
-- Agent decision flow
-- Better control compared to simple LLM chains
+2. The LangGraph agent processes the request.
+
+3. The agent:
+   - Inspects available database tables
+   - Retrieves relevant schema information
+   - Generates a SQL query
+   - Executes the query safely
+
+Example generated query:
+
+```sql
+SELECT COUNT(*) FROM users;
+```
+
+4. The result is converted into a natural language response.
+
+Example:
+
+```
+There are 50 users in your database.
+```
 
 ---
 
@@ -118,84 +87,54 @@ LangGraph provides:
 
 ## Backend
 
-| Technology | Purpose |
-|-|-|
-| Python | Core programming language |
-| FastAPI | Backend API framework |
-| SQLAlchemy | ORM database layer |
-| Pydantic | Data validation |
-| PostgreSQL | Relational database |
+- Python
+- FastAPI
+- SQLAlchemy ORM
+- PostgreSQL
 
+## AI Framework
 
-## AI Stack
+- LangChain
+- LangGraph
+- OpenAI API
 
-| Technology | Purpose |
-|-|-|
-| LangChain | LLM application framework |
-| LangGraph | Agent workflow orchestration |
-| OpenAI / OpenRouter | Large Language Models |
-| Prompt Engineering | Agent reasoning |
+## Frontend
 
+- Gradio
 
-## Development Tools
+## Database
 
-- Git
-- Docker
-- Pytest
-- Uvicorn
-- Alembic
+- PostgreSQL
 
 ---
 
 # 📂 Project Structure
 
 ```
-intelligent-database-agent/
+database-copilot-agent/
 
 │
-├── app/
-│   │
-│   ├── main.py
-│   │
-│   ├── database/
-│   │   ├── connection.py
-│   │   ├── session.py
-│   │   └── base.py
-│   │
-│   ├── models/
-│   │   ├── user.py
-│   │   └── invoice.py
-│   │
-│   ├── schemas/
-│   │   ├── user_schema.py
-│   │   └── invoice_schema.py
-│   │
-│   ├── repositories/
-│   │   ├── user_repository.py
-│   │   └── invoice_repository.py
-│   │
-│   ├── services/
-│   │   ├── user_service.py
-│   │   └── ai_service.py
-│   │
-│   ├── routers/
-│   │   ├── user_routes.py
-│   │   ├── invoice_routes.py
-│   │   └── agent_routes.py
-│   │
-│   ├── agents/
-│   │   ├── graph.py
-│   │   ├── nodes.py
-│   │   └── prompts.py
-│   │
-│   └── config.py
+├── main.py                  # FastAPI application entry point
 │
-├── tests/
+├── db_agent.py              # LangGraph SQL agent implementation
 │
-├── .env.example
+├── agent_routes.py          # AI agent API routes
+│
+├── user_routes.py           # User management APIs
+│
+├── invoice_routes.py        # Invoice management APIs
+│
+├── models/                  # SQLAlchemy ORM models
+│
+├── repositories/            # Database repository layer
+│
+├── database/                # Database configuration
+│
+├── .env                     # Environment variables
+│
 ├── requirements.txt
-├── README.md
-└── Dockerfile
+│
+└── README.md
 ```
 
 ---
@@ -205,13 +144,9 @@ intelligent-database-agent/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/intelligent-database-agent.git
-```
+git clone https://github.com/<username>/database-copilot-agent.git
 
-Move into project:
-
-```bash
-cd intelligent-database-agent
+cd database-copilot-agent
 ```
 
 ---
@@ -222,9 +157,9 @@ cd intelligent-database-agent
 python -m venv .venv
 ```
 
-Activate:
+Activate environment:
 
-### Mac/Linux
+### macOS/Linux
 
 ```bash
 source .venv/bin/activate
@@ -248,199 +183,127 @@ pip install -r requirements.txt
 
 # 🔐 Environment Configuration
 
-Create a `.env` file:
+This project uses environment variables to store sensitive information such as database credentials and API keys.
+
+Create a `.env` file in the project root:
 
 ```env
-DATABASE_URL=postgresql://username:password@localhost:5432/database_name
+# PostgreSQL Database Configuration
+DATABASE_URL=postgresql://<username>:<password>@<host>:<port>/<database_name>
 
-OPENAI_API_KEY=your_api_key
-
-MODEL_NAME=gpt-4.1-mini
-```
-
-Example:
-
-```
-.env.example
-```
-
-should contain:
-
-```env
-DATABASE_URL=
-
-OPENAI_API_KEY=
-
-MODEL_NAME=
-```
-
----
-
-# 🗄️ Database Setup
-
-Create PostgreSQL database:
-
-```sql
-CREATE DATABASE intelligent_agent;
-```
-
-Run migrations:
-
-```bash
-alembic upgrade head
-```
-
----
-
-# ▶️ Run Application
+# OpenAI API Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+# ▶️ Running the Application
 
 Start FastAPI server:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
-Application:
+Application will run at:
 
 ```
 http://127.0.0.1:8000
 ```
 
-API Documentation:
+---
+
+# 💬 Using the AI Database Assistant
+
+Open the Gradio interface:
 
 ```
-http://127.0.0.1:8000/docs
+http://127.0.0.1:8000/agent/ui
+```
+
+Example questions:
+
+```
+How many users are in my database?
+```
+
+```
+Show all invoices.
+```
+
+```
+Which user has the highest invoice amount?
+```
+
+```
+How many invoices were created today?
 ```
 
 ---
 
-# 🔌 API Endpoints
+# 🔒 Database Safety
 
-## Users
+The AI agent is configured to prevent destructive database operations.
 
-```
-POST    /users
-GET     /users
-GET     /users/{id}
-DELETE  /users/{id}
-```
+Allowed:
 
-## Invoices
-
-```
-POST    /invoices
-GET     /invoices
-GET     /invoices/{id}
+```sql
+SELECT
 ```
 
-## AI Agent
+Blocked:
 
-```
-POST /agent/query
-```
-
-Example request:
-
-```json
-{
-    "query": "Show total invoice amount for each customer"
-}
+```sql
+INSERT
+UPDATE
+DELETE
+DROP
+ALTER
 ```
 
-Example response:
-
-```json
-{
-    "answer": "Customer A has total invoices of $5000"
-}
-```
+The agent only performs safe read operations.
 
 ---
 
-# 🏛️ ORM Architecture
-
-This project follows a layered architecture:
-
+# 🧩 LangGraph Agent Workflow
 
 ```
-Router Layer
+User Question
 
-      ↓
+      |
+      v
 
-Service Layer
+Database Agent
 
-      ↓
+      |
+      v
 
-Repository Layer
+Inspect Database Schema
 
-      ↓
+      |
+      v
 
-SQLAlchemy ORM Models
+Generate SQL Query
 
-      ↓
+      |
+      v
 
-PostgreSQL Database
-```
+Execute Query
 
-Benefits:
+      |
+      v
 
-- Separation of concerns
-- Easier testing
-- Maintainable codebase
-- Scalable backend design
-
----
-
-# 🔄 AI Agent Architecture
-
-The AI agent follows a graph-based workflow:
-
-
-```
-START
-
- ↓
-
-User Intent Analysis
-
- ↓
-
-Database Schema Understanding
-
- ↓
-
-SQL Generation
-
- ↓
-
-SQL Validation
-
- ↓
-
-Database Execution
-
- ↓
-
-Answer Generation
-
- ↓
-
-END
+Generate Natural Language Answer
 ```
 
 ---
 
 # 🔮 Future Improvements
 
-- JWT authentication
-- Role-based access control
-- Vector database integration
-- RAG-based database knowledge retrieval
-- Advanced analytics dashboard
-- Docker deployment
-- Kubernetes deployment
-- Cloud hosting
-- Multi-agent collaboration
+- Add user authentication and authorization
+- Support multiple database engines
+- Add SQL query explanation
+- Add database schema visualization
+- Add streaming AI responses
+- Add Docker deployment
+- Add monitoring and logging
+- Add RAG-based database documentation search
 
 ---
 
@@ -448,13 +311,15 @@ END
 
 **Archana Thanuwana**
 
-AI Engineer | Backend Developer
-
-GitHub:
-https://github.com/archanadev-05
+AI / Machine Learning Engineer
 
 ---
 
-# 📜 License
+# ⭐ Acknowledgements
 
-This project is licensed under the MIT License.
+- LangChain
+- LangGraph
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Gradio
