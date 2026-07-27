@@ -183,22 +183,16 @@ pip install -r requirements.txt
 
 # 🔐 Environment Configuration
 
+This project uses environment variables to store sensitive information such as database credentials and API keys.
+
 Create a `.env` file in the project root:
 
 ```env
-DATABASE_URL=postgresql://username:password@localhost:5432/database_name
+# PostgreSQL Database Configuration
+DATABASE_URL=postgresql://<username>:<password>@<host>:<port>/<database_name>
 
-OPENAI_API_KEY=your_openai_api_key
-```
-
-Example:
-
-```env
-DATABASE_URL=postgresql://user:password@localhost:5432/SuperMarket
-```
-
----
-
+# OpenAI API Configuration
+OPENAI_API_KEY=your_openai_api_key_here
 # ▶️ Running the Application
 
 Start FastAPI server:
