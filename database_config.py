@@ -1,8 +1,12 @@
 from typing import AsyncGenerator
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 from sqlalchemy.ext.asyncio import create_async_engine,async_sessionmaker,AsyncSession
-
-DATABASE_URL: str = "postgresql+asyncpg://archana:admin@localhost:5432/SuperMarket"
+load_dotenv()
+DB_URL = os.getenv("DATABASE_URL")
+DATABASE_URL: str = DB_URL
 
 engine = create_async_engine(
     DATABASE_URL,
