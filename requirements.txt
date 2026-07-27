@@ -5,3 +5,9 @@ pydantic
 python-dotenv
 asyncpg
 greenlet
+langchain-community
+langgraph
+langchain-openai
+langchain
+gradio
+psycopg2

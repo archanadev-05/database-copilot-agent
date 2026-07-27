@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -20,3 +21,30 @@ class UserResponse(UserBase):
 class UserUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=5, max_length=255)
     email: Optional[str] = None
+
+class InvoiceBase(BaseModel):
+    user_id: int
+    amount: float= Field(..., gt=0)
+    description: str = Field(..., min_length=2, max_length=500)
+
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+class InvoiceResponse(InvoiceBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AgentQueryRequest(BaseModel):
+    query: str
+    thread_id: str | None = None
+
+class AgentQueryResponse(BaseModel):
+    query: str
+    result: str
+    thread_id: str
+
+    
