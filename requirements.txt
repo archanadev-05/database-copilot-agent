@@ -11,3 +11,4 @@ langchain-openai
 langchain
 gradio
 psycopg2
+langgraph-checkpoint-postgres

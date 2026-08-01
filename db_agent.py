@@ -1,5 +1,9 @@
 from logging import config
-
+import psycopg
+from langgraph.checkpoint.postgres import PostgresSaver
+import psycopg
+import psycopg2
+from anyio.lowlevel import checkpoint
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_classic.chains.sql_database import query
@@ -7,6 +11,7 @@ from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_community.utilities import SQLDatabase
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.postgres import PostgresSaver
 
 load_dotenv()
 
@@ -52,11 +57,24 @@ Then you should query the schema of the most relevant tables.
 
 
 
+
+conn = psycopg.connect(
+    DB_URL,
+    autocommit=True
+
+)
+
+checkpointer = PostgresSaver(conn)
+
+checkpointer.setup()
+
+
+
 agent = create_agent(
     model=model,
     tools=tools,
     system_prompt=system_prompt,
-    checkpointer=InMemorySaver()
+    checkpointer=checkpointer
 
 )
 
