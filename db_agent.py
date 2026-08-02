@@ -1,5 +1,9 @@
 from logging import config
+from uuid import uuid4
+
 import psycopg
+from langchain_classic.agents.chat.prompt import HUMAN_MESSAGE
+from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 import psycopg
 import psycopg2
@@ -12,6 +16,7 @@ from langchain_community.utilities import SQLDatabase
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.postgres import PostgresSaver
+from sqlalchemy.ext.asyncio import AsyncSession
 
 load_dotenv()
 
@@ -58,14 +63,8 @@ Then you should query the schema of the most relevant tables.
 
 
 
-conn = psycopg.connect(
-    DB_URL,
-    autocommit=True
-
-)
-
+conn = psycopg.connect(DB_URL,autocommit=True)
 checkpointer = PostgresSaver(conn)
-
 checkpointer.setup()
 
 
@@ -75,8 +74,35 @@ agent = create_agent(
     tools=tools,
     system_prompt=system_prompt,
     checkpointer=checkpointer
-
 )
+
+
+
+async def propose_dml_statement_for_human_approval(
+        question: str,
+        session: AsyncSession,
+):
+    schema_details = db.get_table_info()
+    prompt = f"""
+    You are SQL assistant, Generate Exactly INSERT,UPDATE,DELETE Statements
+    Depending on the users requirements for {db.dialect}. User Provided Schema and DO NOT
+    output anything except for the SQL statement. Do not Wrap it in code fences
+    
+    {schema_details}
+    
+    User Request - {query}
+    
+    """
+
+    resp = model.invoke([
+        SystemMessage(content="You only Return single SQL statement"),
+        HumanMessage(content=prompt),
+    ])
+
+    sql = resp.content if hasattr(resp, "content") else str(resp)
+
+    approval_id = str(uuid4())
+
 
 def query_db_with_natural_language(user_input:str, thread_id:str = "1"):
     try:

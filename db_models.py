@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import String, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedColumn
+from sqlalchemy import String, func, Text
+from sqlalchemy.orm import DeclarativeBase, Mapped, MappedColumn, mapped_column
 
 
 class Base(DeclarativeBase): #DRY-Dont Repeat yourself
@@ -20,6 +20,17 @@ class Invoice(Base):
     amount : Mapped[float]
     description : Mapped[str] = MappedColumn(String(255), nullable=False)
     created_at : Mapped[datetime] = MappedColumn(
+        server_default= func.now(),
+        default= datetime.now()
+    )
+
+class PendingInsertRequest(Base):
+    __tablename__ = 'pending_requests'
+    id : Mapped[str] = mapped_column(String(36) , primary_key=True)
+    query : Mapped[str] = mapped_column(String(1000))
+    sql : Mapped[str] = mapped_column(Text())
+    status : Mapped[str] = mapped_column(String(20), default='pending')
+    created_at : Mapped[datetime] = mapped_column(
         server_default= func.now(),
         default= datetime.now()
     )
