@@ -2,6 +2,7 @@ from logging import config
 from uuid import uuid4
 
 import psycopg
+from fastapi.params import Depends
 from langchain_classic.agents.chat.prompt import HUMAN_MESSAGE
 from langchain_core.messages import SystemMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
@@ -10,13 +11,16 @@ import psycopg2
 from anyio.lowlevel import checkpoint
 from dotenv import load_dotenv
 from langchain.agents import create_agent
-from langchain_classic.chains.sql_database import query
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_community.utilities import SQLDatabase
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.postgres import PostgresSaver
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from database_config import get_db
+from db_models import PendingRequest
+from resp_models import DMLApprovalRequest
 
 load_dotenv()
 
@@ -78,8 +82,31 @@ agent = create_agent(
 
 
 
+
+
+def query_db_with_natural_language(user_input:str, thread_id:str = "1"):
+    try:
+        config = {"configurable": {"thread_id": thread_id}}
+        output_result = None
+
+        for step in agent.stream(
+                {"messages": [{"role" : "user", "content" : user_input}]},
+                config,
+                stream_mode="values"
+        ):
+            if "messages" in step:
+                last_message = step["messages"][-1]
+                if hasattr(last_message, "content"):
+                    output_result = last_message.content
+
+        return output_result if output_result else "No content"
+    except Exception as e:
+        return f"Error Occurred - {str(e)}"
+
+
+
 async def propose_dml_statement_for_human_approval(
-        question: str,
+        query: str,
         session: AsyncSession,
 ):
     schema_details = db.get_table_info()
@@ -103,24 +130,43 @@ async def propose_dml_statement_for_human_approval(
 
     approval_id = str(uuid4())
 
+    pending_request = PendingRequest(
+        id = approval_id,
+        query = query,
+        sql = sql,
+        status = "pending",
+    )
+    session.add(pending_request)
+    await session.commit()
+    return {
+        "approval_id": approval_id,
+        "sql": sql,
+        "status": "pending"
+    }
 
-def query_db_with_natural_language(user_input:str, thread_id:str = "1"):
-    try:
-        config = {"configurable": {"thread_id": thread_id}}
-        output_result = None
+async def approve_and_execute(
+        approval_id: str,
+        approve: bool,
+        session: AsyncSession
+):
+    pending_request = await session.get(PendingRequest, approval_id) #fetches the record corresponding to the PK
 
-        for step in agent.stream(
-                {"messages": [{"role" : "user", "content" : user_input}]},
-                config,
-                stream_mode="values"
-        ):
-            if "messages" in step:
-                last_message = step["messages"][-1]
-                if hasattr(last_message, "content"):
-                    output_result = last_message.content
+    if not pending_request:
+        return ValueError(f"Record not found for approval_id: {approval_id}")
 
-        return output_result if output_result else "No content"
-    except Exception as e:
-        return f"Error Occurred - {str(e)}"
+    if pending_request.status != "pending":
+        raise ValueError("This request has already been processed.")
+
+    if not approve:
+        pending_request.status = "Rejected"
+        await session.commit()
+        return "Rejected"
+
+    result = db.run( pending_request.sql)
+    pending_request.status = "Approved"
+    await session.commit()
+    return str(result)
+
+
 
 

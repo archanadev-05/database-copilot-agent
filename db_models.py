@@ -24,7 +24,7 @@ class Invoice(Base):
         default= datetime.now()
     )
 
-class PendingInsertRequest(Base):
+class PendingRequest(Base):
     __tablename__ = 'pending_requests'
     id : Mapped[str] = mapped_column(String(36) , primary_key=True)
     query : Mapped[str] = mapped_column(String(1000))
